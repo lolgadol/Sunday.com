@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 import TaskTable from "./taskTable";
 import { useUserContext } from "./UserContext";
 
@@ -12,7 +12,6 @@ const Home = ()=> {
         navigate("/CreateGroup")
     }
 
-    const location = useLocation();
     const {currentUsername} = useUserContext();
 
     function newTaskButton() {

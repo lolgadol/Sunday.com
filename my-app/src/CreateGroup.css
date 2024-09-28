@@ -1,0 +1,24 @@
+.underline {
+    text-decoration: underline;
+    justify-content: center;
+    display: flex;
+
+}
+.input {
+    margin-left: 45vw;
+    
+}
+
+.buttonCreateGroup {
+    margin-top: 1px;
+    margin-left: 45vw;
+    background-color: black;
+    border-color:black;
+    
+
+}
+
+.buttonCreateGroup:hover {
+    background-color: green;
+    border-color: green;
+}
