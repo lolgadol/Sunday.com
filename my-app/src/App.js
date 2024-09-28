@@ -6,6 +6,7 @@ import Register from './Register';
 import Home from './Home';
 import CreateTask from './CreateTask';
 import { UserProvider } from './UserContext';
+import CreateGroup from './CreateGroup';
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path="/Register" element={<Register />} />
           <Route path="/Home" element={<Home/>} />
           <Route path="/CreateTask" element={<CreateTask/>} />
+          <Route path="/CreateGroup" element={<CreateGroup/>} />
         </Routes>
       </Router>
     </UserProvider>

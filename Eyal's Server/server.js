@@ -3,7 +3,8 @@ const cors = require("cors");
 const User = require("./User");
 const app = express();
 const mongoose = require('mongoose');
-const Task = require("./Task");
+const {Task} = require("./Task");
+const Group = require("./Group");
 app.use(cors());
 app.use(express.json());
 
@@ -92,9 +93,61 @@ app.get('/tasks/:userId', async (req, res) => {
     catch(err) {
         res.status(500).json({error: err.message});
     }
+  });
+
+  app.post("/group",async(req,res) => {
+    const {groupName,adminId} = req.body;
+    const name = await Group.findOne({name:groupName});
+    const admin = await User.findOne({_id:adminId});
+
+    if(admin.group !== "") {
+        return res.status(400).send({msg: "You are already the leader of a group"});
+    }
+
+    if(name) {
+        return res.status(400).send({msg: "group name already exists"});
+    }
+    const newGroup = new Group({name:groupName, adminId: adminId,memberId:[adminId]});
+
     
-    
-    
+    admin.group = groupName;
+
+    await admin.save();
+
+    await newGroup.save();
+
+    res.status(200).send({msg:"new group created"});
+
+  });
+
+  app.post("/leaveGroup",async(req,res) => {
+    const {userId} = req.body;
+    const user = await User.findOne({_id:userId});
+    const group = user.group;
+
+    if(group === "")return res.status(400).send({msg:"you have no group"});
+
+    const groupFound = await Group.findOne({name: group});
+
+    if(groupFound.adminId === userId) {
+        await Group.deleteOne({name: group});
+
+    }
+    else {
+        const newMembers = groupFound.memberId.filter((memberId) => memberId !== userId);
+        groupFound.memberId = newMembers;
+
+        await groupFound.save();
+    }
+
+    user.group = "";
+    await user.save();
+    res.status(200).send({msg: "you left the group!!!!!!!!!!!!!!!!!!!!!!!!!!"});
   })
+
+
+
+
+
 
 app.listen(5000);
