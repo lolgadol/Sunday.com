@@ -44,7 +44,7 @@ const TaskTable = ({username}) => {
         event.stopPropagation();
         if(isVisible){setIsVisible(false);}
     }
-    const {id,setId} = useUserContext();
+    const {user,setUser} = useUserContext();
     // const tasks = [
     //     { id: 1, name: 'Task 1', priority: "Low", status: 'Done', DueDate: "23/9/24"},
     //     { id: 2, name: 'Task 2', priority: "Medium", status: 'Working on it',DueDate:"19/10/25" },
@@ -57,7 +57,7 @@ const TaskTable = ({username}) => {
 
       useEffect(() =>{
         console.log('ended editing');
-        fetch('http://localhost:5000/tasks/' + id)
+        fetch('http://localhost:5000/tasks/' + user._id)
         .then(response => response.json()) // Parse the JSON from the response
         .then(data => setTasksTable(data))      // Store the fetched data in the state
         .catch(error => console.error('Error fetching data:', error));

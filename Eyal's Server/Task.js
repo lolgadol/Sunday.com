@@ -29,7 +29,7 @@ const TaskSchema = new mongoose.Schema({
         default: Date.now.toString()
 
     }
-})
+},{ discriminatorKey: 'kind' });
 const Task = mongoose.model("Task",TaskSchema);
 
 module.exports = {Task,TaskSchema};

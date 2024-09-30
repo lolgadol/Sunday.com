@@ -4,6 +4,7 @@ const User = require("./User");
 const app = express();
 const mongoose = require('mongoose');
 const {Task} = require("./Task");
+const GroupTask = require("./GroupTask");
 const Group = require("./Group");
 app.use(cors());
 app.use(express.json());
@@ -109,14 +110,14 @@ app.get('/tasks/:userId', async (req, res) => {
     }
     const newGroup = new Group({name:groupName, adminId: adminId,memberId:[adminId]});
 
+    await newGroup.save();
     
-    admin.group = groupName;
+    admin.group = newGroup._id;
 
     await admin.save();
 
-    await newGroup.save();
 
-    res.status(200).send({msg:"new group created"});
+    res.status(200).send({newGroup});
 
   });
 
@@ -127,22 +128,28 @@ app.get('/tasks/:userId', async (req, res) => {
 
     if(group === "")return res.status(400).send({msg:"you have no group"});
 
-    const groupFound = await Group.findOne({name: group});
+    const groupFound = await Group.findOne({_id: group});
 
     if(groupFound.adminId === userId) {
-        await Group.deleteOne({name: group});
-
+        await Group.deleteOne({_id: group});
     }
     else {
         const newMembers = groupFound.memberId.filter((memberId) => memberId !== userId);
         groupFound.memberId = newMembers;
-
+        //TODO: add new Admin
         await groupFound.save();
     }
 
     user.group = "";
     await user.save();
     res.status(200).send({msg: "you left the group!!!!!!!!!!!!!!!!!!!!!!!!!!"});
+  })
+
+  app.post("/groupTask",async(req,res) => {
+    const {user_id,name,priority,status,dueDate} = req.body;//user_id = task_id
+    const newTask = new GroupTask({user_id,name,priority,status,dueDate,workingOnIt:["user1"],});
+    await newTask.save();
+    res.status(200).send({msg: "task created"});
   })
 
 
