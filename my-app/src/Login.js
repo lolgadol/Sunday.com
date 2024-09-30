@@ -7,9 +7,8 @@ function Login() {
     const[username,setUsername] = useState('');
     const[password,setPassword] = useState('');
 
-    const {setCurrentUsername} = useUserContext();
+    const {setUser} = useUserContext();
     
-    const{id,setId} = useUserContext();
     const navigate = useNavigate();
     async function buttonLogin() {
         fetch("http://localhost:5000/login",{
@@ -24,8 +23,7 @@ function Login() {
         }).then(async response=>{
             if(response.ok) {
                 const nig = await response.json();
-                setId(nig.user._id);
-                setCurrentUsername(username);
+                setUser(nig.user);
                 navigate("/home");
                 
 

@@ -5,7 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import { useUserContext } from './UserContext';
 
 function UpdateModal({ show, setShow, task, setEndEdit }) {
-  const { id } = useUserContext();
+  const { user } = useUserContext();
 
   // State to hold the form data
   const [formData, setFormData] = useState({
@@ -48,7 +48,7 @@ function UpdateModal({ show, setShow, task, setEndEdit }) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          user_id: id,
+          user_id: user._id,
           ...formData // Spread form data into request body
         })
       });

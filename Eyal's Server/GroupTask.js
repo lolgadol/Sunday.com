@@ -1,11 +1,10 @@
 const mongoose = require("mongoose");
-const Task = require("./Task");
+const {Task} = require("./Task");
 
+const GroupTaskSchema = new mongoose.Schema({
+    workingOnIt: [String] 
+});
 
-const GroupTaskSchema = Task.TaskSchema.discriminator("GroupTask",new mongoose.Schema({
-    workingOnIt: [String]
-}));
-
-
-const GroupTask = mongoose.model("GroupTask",GroupTaskSchema);
-module.exports = GroupTask;
+//TODO: make grouptask be saved in groupTasks collection in mongo
+const GroupTask = Task.discriminator("", GroupTaskSchema,"GroupTasks");
+module.exports = GroupTask; // Export GroupTask model

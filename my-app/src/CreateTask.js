@@ -12,32 +12,58 @@ function CreateTask() {
 
     //const titlepriority = "priority"
 
-    const {id,setId} = useUserContext();
+    const {user,setUser} = useUserContext();
     const [name,setName] = useState('');
     const [priority,setPriority] = useState('priority');
     const [status,setStatus] = useState('status');
     const [dueDate,setDueDate] = useState('');
+    const [taskPersonal,setTaskPersonal] = useState('personal');
 
     const {currentUsername} = useUserContext();
     
     const navigate = useNavigate();
-    console.log(id);
+    console.log(user._id);
     function createTaskButton() {
-        console.log(status + " " + priority);
-        fetch("http://localhost:5000/task",{method:"POST",headers:{"Content-Type" : "application/json"},body:JSON.stringify({
-            user_id:id,name,priority,status,dueDate
-            })
+        if(taskPersonal === "personal") {
 
-        }).then(response=>{
-            if(response.ok) {
-                alert("NIGGER NIGGER NIGGER");
-                navigate("/home");
+            console.log(status + " " + priority);
+            fetch("http://localhost:5000/task",{method:"POST",headers:{"Content-Type" : "application/json"},body:JSON.stringify({
+                user_id:user._id,name,priority,status,dueDate
+                })
+    
+            }).then(response=>{
+                if(response.ok) {
+                    alert("NIGGER NIGGER NIGGER");
+                    navigate("/home");
+                }
+                else
+                {
+                    alert("NIGGG");
+                }
+            });
+        }
+        else if(taskPersonal === "group") {
+            if(user.group === "") {
+                alert("you have no group my nigga");
             }
-            else
-            {
-                alert("NIGGG");
+            else {
+
+                fetch("http://localhost:5000/groupTask", {
+                    method:"POST",
+                    headers:{"Content-Type" : "application/json"},
+                    body: JSON.stringify({user_id: user.group,name,priority,status,dueDate})
+                    
+                }).then(response=>{
+                    if(response.ok) {
+                        alert("task created successfully");
+                        navigate("/home");
+                    }
+                    else {
+                        alert("task not created successfully")
+                    }
+                })
             }
-        })
+        }
 
     }
     return(
@@ -49,6 +75,7 @@ function CreateTask() {
             <input className="input" placeholder="due date"onChange= {(e) => setDueDate(e.target.value)}></input>
             <CustomDropDown className = "dropDown" items = {["low","medium","high"]} title = {priority} setState={setPriority} /> 
             <CustomDropDown className = "dropDown" items= {['done','working on it','stuck','other']}title = {status} setState={setStatus}/>
+            <CustomDropDown className = "dropDown" items = {["personal","group"]} title = {taskPersonal} setState={setTaskPersonal} />
             <button className="input" onClick={()=>createTaskButton()}>Add task</button>
             
         </div>
