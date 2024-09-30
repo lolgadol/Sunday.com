@@ -125,19 +125,27 @@ app.get('/tasks/:userId', async (req, res) => {
     const {userId,groupName} = req.body;
     const group = await Group.findOne({name: groupName});
 
+    const user = await User.findOne({_id: userId});
+
     if(group) {
         try {
             if(group.memberId.includes(userId)) {
-                res.status(400).send({msg: "already part of this group"})
+                res.status(400).send({msg: "already part of this group"});
             }
             else {
                 group.memberId.push(userId);
-                res.status(200).send({msg: "joined group succesfully"});
+                user.group = group._id;
+                await user.save();
+                await group.save();
+                res.status(200).send({msg: "joined group succesfully",group: group._id});
             }
         }
         catch(e) {
             res.status(500).send(e.message);
         }
+    }
+    else {
+        res.status(404).send({msg: "group doesn't exist"});
     }
   })
 
@@ -151,6 +159,14 @@ app.get('/tasks/:userId', async (req, res) => {
     const groupFound = await Group.findOne({_id: group});
 
     if(groupFound.adminId === userId) {
+        const allMembers = groupFound.memberId;
+        allMembers.map(async member => {
+            const memberName = await User.findOne({_id: member});//deleting the group from everyone when deleted
+            if(memberName) {
+                memberName.group = "";
+                await memberName.save();
+            }
+        })
         await Group.deleteOne({_id: group});
     }
     else {
@@ -167,7 +183,7 @@ app.get('/tasks/:userId', async (req, res) => {
 
   app.post("/groupTask",async(req,res) => {
     const {user_id,name,priority,status,dueDate} = req.body;//user_id = task_id
-    const newTask = new GroupTask({user_id,name,priority,status,dueDate,workingOnIt:["user1"],});
+    const newTask = new GroupTask({user_id,name,priority,status,dueDate,workingOnIt:["user1"],});//TODO: add functionality to working on it
     await newTask.save();
     res.status(200).send({msg: "task created"});
   })

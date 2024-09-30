@@ -10,7 +10,7 @@ import UpdateModal from './UpdateModal';
 
 
 
-const TaskTable = ({username}) => {
+const TaskTable = () => {
     
 
 
