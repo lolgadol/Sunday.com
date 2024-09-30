@@ -89,7 +89,7 @@ app.get('/tasks/:userId', async (req, res) => {
     try
     {
         await Task.deleteOne({_id: taskId});
-        res.status(200).json({msg: "succesfully deleted user"});
+        res.status(200).json({msg: "succesfully deleted task"});
     }
     catch(err) {
         res.status(500).json({error: err.message});

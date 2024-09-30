@@ -27,6 +27,7 @@ const TaskTable = ({username}) => {
     
     function updateTable() {
         setTasksTable((prevTasks=>prevTasks.filter(task=>task._id != selectedTask._id)));
+        setGroupTasksTable((prevTasks=>prevTasks.filter(task=>task._id != selectedTask._id)));
     }
 
 
