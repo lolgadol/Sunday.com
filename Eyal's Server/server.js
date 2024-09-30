@@ -120,6 +120,26 @@ app.get('/tasks/:userId', async (req, res) => {
     res.status(200).send({newGroup});
 
   });
+  
+  app.post("/joinGroup",async(req,res) => {
+    const {userId,groupName} = req.body;
+    const group = await Group.findOne({name: groupName});
+
+    if(group) {
+        try {
+            if(group.memberId.includes(userId)) {
+                res.status(400).send({msg: "already part of this group"})
+            }
+            else {
+                group.memberId.push(userId);
+                res.status(200).send({msg: "joined group succesfully"});
+            }
+        }
+        catch(e) {
+            res.status(500).send(e.message);
+        }
+    }
+  })
 
   app.post("/leaveGroup",async(req,res) => {
     const {userId} = req.body;

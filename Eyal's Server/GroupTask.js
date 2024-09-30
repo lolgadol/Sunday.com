@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
-const {Task} = require("./Task"); // Import Task model
+const {Task} = require("./Task");
 
 const GroupTaskSchema = new mongoose.Schema({
-    workingOnIt: [String] // Field for users working on this group task
+    workingOnIt: [String] 
 });
 
-// Use the discriminator method to create GroupTask model in the "GroupTasks" collection
+//TODO: make grouptask be saved in groupTasks collection in mongo
 const GroupTask = Task.discriminator("", GroupTaskSchema,"GroupTasks");
 module.exports = GroupTask; // Export GroupTask model

@@ -18,6 +18,7 @@ const TaskTable = ({username}) => {
     const [isVisible,setIsVisible] = useState(false);
     const [selectedTask,setSelectedTask] = useState({name: "name",status:"status",priority:"priority",dueDate:"dueDate"});
     const [tasksTable,setTasksTable] = useState([]);
+    const [groupTasksTable,setGroupTasksTable] = useState([]);
     const [show,setShow] = useState(false);
 
     const [endEdit,setEndEdit] = useState(false);
@@ -58,8 +59,18 @@ const TaskTable = ({username}) => {
       useEffect(() =>{
         console.log('ended editing');
         fetch('http://localhost:5000/tasks/' + user._id)
-        .then(response => response.json()) // Parse the JSON from the response
-        .then(data => setTasksTable(data))      // Store the fetched data in the state
+        .then(response => response.json()) //fetches personal tasks
+        .then(data => { 
+            setTasksTable(data.map(task => ({// adds me to the personal tasks
+                ...task, 
+                workingOnIt: "me" 
+            })))
+          })      
+        .catch(error => console.error('Error fetching data:', error));
+
+        fetch('http://localhost:5000/tasks/' + user.group)
+        .then(response => response.json()) 
+        .then(data => setGroupTasksTable(data)) //fetches group tasks   
         .catch(error => console.error('Error fetching data:', error));
         
       },[endEdit])
@@ -87,12 +98,13 @@ const TaskTable = ({username}) => {
                         <th>Status</th>
                         <th>Priority</th>
                         <th>Due Date</th>
+                        <th>Working on task</th> 
                     </tr>
                 </thead>
 
                 <tbody>
 
-                    {tasksTable.map(task => (
+                    {[...tasksTable,...groupTasksTable].map(task => (
 
                         <tr key={task._id} onContextMenu={(e) => onRowRightClick(e,task)} >
 
@@ -101,6 +113,7 @@ const TaskTable = ({username}) => {
                             <td>{task.priority}</td>
                             <td>{task.status}</td>
                             <td>{task.dueDate}</td>
+                            <td>{task.workingOnIt}</td>
                                 
 
 

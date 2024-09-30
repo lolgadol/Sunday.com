@@ -55,7 +55,8 @@ function CreateTask() {
                     
                 }).then(response=>{
                     if(response.ok) {
-                        alert("task created successfully")
+                        alert("task created successfully");
+                        navigate("/home");
                     }
                     else {
                         alert("task not created successfully")
