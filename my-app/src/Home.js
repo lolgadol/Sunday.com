@@ -30,6 +30,7 @@ const Home = ()=> {
             <button onClick={() => newGroupButton()}>Create new group</button>
             <button onClick={()=> joinGroupButton()}>Join Group</button>
             <JoinGroupModal show = {show} setShow = {setShow}/>
+            
             <TaskTable />
         </div>
     );

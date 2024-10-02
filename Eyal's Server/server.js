@@ -66,7 +66,6 @@ app.get('/tasks/:userId', async (req, res) => {
       const {userId} = req.params;
       
       const tasks = await Task.find({creator_id:userId});
-      console.log(tasks);
       return res.status(200).send(tasks);
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -77,15 +76,23 @@ app.get('/tasks/:userId', async (req, res) => {
   app.post("/task/:taskId",async(req,res) => {
     try {
         const {taskId} = req.params;
-        const data = req.body;
         const currentTask = await Task.findOne({_id: taskId});
-        const {creator_id,name,priority,status,dueDate} = req.body;
+        const {creator_id,name,priority,status,dueDate,workingOnIt} = req.body;
         currentTask.creator_id = creator_id;
         currentTask.name = name;
         currentTask.priority = priority;
         currentTask.status = status;
         currentTask.dueDate = dueDate;
-        console.log(req.body);
+
+        const userIds = [];
+
+        for(const element of workingOnIt) {
+            const user = await User.findOne({username: element});
+            userIds.push(user._id);
+        }
+
+        currentTask.workingOnIt = userIds;
+        
         if(currentTask!= null){await currentTask.save();}
         res.status(200).send(currentTask);
     }
@@ -131,6 +138,35 @@ app.get('/tasks/:userId', async (req, res) => {
     res.status(200).send({newGroup});
 
   });
+
+  app.get("/group/:id",async(req,res) => {
+
+    try{
+        const {id} = req.params;
+        const group = await Group.findOne({_id: id});
+        if(group){
+            const allMembers = group.memberId;
+            const users = [];
+            for (const member of allMembers) {
+                const user = await User.findOne({ _id: member }); // Fetch user by ID
+                users.push(user); // Push the user to the users array
+            }
+            console.log(users);
+            res.status(200).send(users);
+
+        }
+        else {
+            res.status(404).send({msg: "brother"});
+        }
+    }
+    catch(e) {
+        res.status(500).send({msg:"bro"})
+    }
+
+
+    
+
+  })
   
   app.post("/joinGroup",async(req,res) => {
     const {userId,groupName} = req.body;

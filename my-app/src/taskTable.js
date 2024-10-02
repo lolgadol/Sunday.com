@@ -67,7 +67,7 @@ const TaskTable = () => {
         .then(data => { 
             setTasksTable(data.map(task => ({// adds me to the personal tasks
                 ...task, 
-                workingOnIt: "me" 
+                workingOnIt: ["me"] 
             })))
           })      
         .catch(error => console.error('Error fetching data:', error));
@@ -135,7 +135,7 @@ const TaskTable = () => {
                             <td>{task.priority}</td>
                             <td>{task.status}</td>
                             <td>{task.dueDate}</td>
-                            <td>{task.workingOnIt}</td>
+                            <td>{task.workingOnIt.join(",")}</td>
                                 
 
 
