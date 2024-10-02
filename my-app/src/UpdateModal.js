@@ -48,7 +48,7 @@ function UpdateModal({ show, setShow, task, setEndEdit }) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          user_id: user._id,
+          creator_id: user._id,
           ...formData // Spread form data into request body
         })
       });

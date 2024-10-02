@@ -14,6 +14,17 @@ mongoose.connect(mongo_uri, {
     
 });
 
+app.get("/user/:id",async(req,res)=> {
+    try {
+        const {id} = req.params;
+        const user = await User.findOne({_id:id});
+        return res.status(200).send({user});
+    }
+    catch(e) {
+        return res.status(500).send({msg: e.message});
+    }
+})
+
 
 app.post("/login",async(req,res) =>{
     const {username,password} = req.body;
@@ -44,8 +55,8 @@ app.post("/register",async(req,res) =>{
 
 
 app.post("/task",async(req,res) => {
-    const {user_id,name,priority,status,dueDate} = req.body;
-    const newTask = new Task({user_id,name:name,priority:priority,status:status,dueDate:dueDate});
+    const {creator_id,name,priority,status,dueDate} = req.body;
+    const newTask = new Task({creator_id,name:name,priority:priority,status:status,dueDate:dueDate});
     await newTask.save();
     res.status(201).json({msg:"task saved succesfully"});
     
@@ -54,9 +65,9 @@ app.get('/tasks/:userId', async (req, res) => {
     try {
       const {userId} = req.params;
       
-      const tasks = await Task.find({user_id:userId});
+      const tasks = await Task.find({creator_id:userId});
       console.log(tasks);
-      res.json(tasks);
+      return res.status(200).send(tasks);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
@@ -68,8 +79,8 @@ app.get('/tasks/:userId', async (req, res) => {
         const {taskId} = req.params;
         const data = req.body;
         const currentTask = await Task.findOne({_id: taskId});
-        const {user_id,name,priority,status,dueDate} = req.body;
-        currentTask.user_id = user_id;
+        const {creator_id,name,priority,status,dueDate} = req.body;
+        currentTask.creator_id = creator_id;
         currentTask.name = name;
         currentTask.priority = priority;
         currentTask.status = status;
@@ -182,11 +193,11 @@ app.get('/tasks/:userId', async (req, res) => {
   })
 
   app.post("/groupTask",async(req,res) => {
-    const {user_id,name,priority,status,dueDate} = req.body;//user_id = task_id
-    const newTask = new GroupTask({user_id,name,priority,status,dueDate,workingOnIt:["user1"],});//TODO: add functionality to working on it
+    const {user_id,group_id,name,priority,status,dueDate} = req.body;//creator_id = task_id
+    const newTask = new GroupTask({creator_id:group_id,name,priority,status,dueDate,workingOnIt:[user_id],});//TODO: add functionality to working on it
     await newTask.save();
     res.status(200).send({msg: "task created"});
-  })
+  });
 
 
 
