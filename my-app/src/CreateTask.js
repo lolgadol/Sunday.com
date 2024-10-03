@@ -28,7 +28,7 @@ function CreateTask() {
 
             console.log(status + " " + priority);
             fetch("http://localhost:5000/task",{method:"POST",headers:{"Content-Type" : "application/json"},body:JSON.stringify({
-                user_id:user._id,name,priority,status,dueDate
+                creator_id:user._id,name,priority,status,dueDate
                 })
     
             }).then(response=>{
@@ -51,7 +51,7 @@ function CreateTask() {
                 fetch("http://localhost:5000/groupTask", {
                     method:"POST",
                     headers:{"Content-Type" : "application/json"},
-                    body: JSON.stringify({user_id: user.group,name,priority,status,dueDate})
+                    body: JSON.stringify({user_id: user._id,group_id: user.group,name,priority,status,dueDate})
                     
                 }).then(response=>{
                     if(response.ok) {

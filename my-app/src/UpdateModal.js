@@ -3,9 +3,17 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import { useUserContext } from './UserContext';
+import MultiSelectDropdown from './MultiSelectDropDown';
 
 function UpdateModal({ show, setShow, task, setEndEdit }) {
+
+  const [selectedOptions, setSelectedOptions] = useState([]);
+
+  const [options,setOptions] = useState([]);
+
+
   const { user } = useUserContext();
+  
 
   // State to hold the form data
   const [formData, setFormData] = useState({
@@ -15,6 +23,18 @@ function UpdateModal({ show, setShow, task, setEndEdit }) {
     dueDate: task.dueDate
   });
 
+  async function getGroupMembers() {
+    const response = await fetch("http://localhost:5000/group/" + task.creator_id,{
+      method: "GET",
+      headers: {"Content-Type" : "application/json"}
+    })
+    if(response.ok) {
+      const responseJson = await response.json();
+      setOptions(responseJson.map(user=> {
+        return user.username;
+      }))
+    }
+  }
   // Manually reset form data each time the modal opens
   useEffect(() => {
     if (show) {
@@ -25,6 +45,7 @@ function UpdateModal({ show, setShow, task, setEndEdit }) {
         priority: task.priority,
         dueDate: task.dueDate
       });
+      getGroupMembers();     
     }
   }, [show, task]); // Only runs when `show` or `task` changes
 
@@ -41,6 +62,10 @@ function UpdateModal({ show, setShow, task, setEndEdit }) {
 
   // Function to handle the form submission and task update
   async function updateButton() {
+    console.log(selectedOptions);
+
+   
+
     try {
       const response = await fetch(`http://localhost:5000/task/${task._id}`, {
         method: 'POST',
@@ -48,8 +73,9 @@ function UpdateModal({ show, setShow, task, setEndEdit }) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          user_id: user._id,
-          ...formData // Spread form data into request body
+          creator_id: task.kind ? user.group : user._id,
+          workingOnIt: selectedOptions,
+          ...formData, // Spread form data into request body
         })
       });
 
@@ -62,6 +88,8 @@ function UpdateModal({ show, setShow, task, setEndEdit }) {
 
     handleClose();
   }
+
+
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -105,6 +133,8 @@ function UpdateModal({ show, setShow, task, setEndEdit }) {
               onChange={handleInputChange}
             />
           </Form.Group>
+
+          <MultiSelectDropdown setShow={()=>{}} options={options} setSelectedOptions={setSelectedOptions} selectedOptions={selectedOptions}></MultiSelectDropdown>
         </Form>
       </Modal.Body>
       <Modal.Footer>

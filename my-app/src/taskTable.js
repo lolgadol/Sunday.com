@@ -24,6 +24,9 @@ const TaskTable = () => {
     const [endEdit,setEndEdit] = useState(false);
 
 
+    const {user} = useUserContext();
+
+
     
     function updateTable() {
         setTasksTable((prevTasks=>prevTasks.filter(task=>task._id != selectedTask._id)));
@@ -46,7 +49,7 @@ const TaskTable = () => {
         event.stopPropagation();
         if(isVisible){setIsVisible(false);}
     }
-    const {user,setUser} = useUserContext();
+    
     // const tasks = [
     //     { id: 1, name: 'Task 1', priority: "Low", status: 'Done', DueDate: "23/9/24"},
     //     { id: 2, name: 'Task 2', priority: "Medium", status: 'Working on it',DueDate:"19/10/25" },
@@ -64,17 +67,35 @@ const TaskTable = () => {
         .then(data => { 
             setTasksTable(data.map(task => ({// adds me to the personal tasks
                 ...task, 
-                workingOnIt: "me" 
+                workingOnIt: ["me"] 
             })))
           })      
         .catch(error => console.error('Error fetching data:', error));
 
         fetch('http://localhost:5000/tasks/' + user.group)
         .then(response => response.json()) 
-        .then(data => setGroupTasksTable(data)) //fetches group tasks   
+        .then(data => { 
+            data.map(task=> {
+                task.workingOnIt.map( async (worker,index) =>{ 
+                    const response = await fetch("http://localhost:5000/user/" + worker,{
+                        method: "GET",
+                        headers:{"Content-Type" : "application/json"}
+                    })
+                    if(response.ok) {
+                        const responseJson = await response.json();
+                        task.workingOnIt[index] = responseJson.user.username;
+                        setGroupTasksTable([...data]);
+                        
+                    }
+                })
+
+            })
+            
+            
+        }) //fetches group tasks   
         .catch(error => console.error('Error fetching data:', error));
         
-      },[endEdit])
+      },[endEdit,user.group])
 
 
 
@@ -114,7 +135,7 @@ const TaskTable = () => {
                             <td>{task.priority}</td>
                             <td>{task.status}</td>
                             <td>{task.dueDate}</td>
-                            <td>{task.workingOnIt}</td>
+                            <td>{task.workingOnIt.join(",")}</td>
                                 
 
 
