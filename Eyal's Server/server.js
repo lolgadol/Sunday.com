@@ -23,7 +23,7 @@ app.get("/user/:id",async(req,res)=> {
     catch(e) {
         return res.status(500).send({msg: e.message});
     }
-})
+});
 
 
 app.post("/login",async(req,res) =>{
@@ -92,7 +92,7 @@ app.get('/tasks/:userId', async (req, res) => {
         }
 
         currentTask.workingOnIt = userIds;
-        
+
         if(currentTask!= null){await currentTask.save();}
         res.status(200).send(currentTask);
     }
@@ -138,6 +138,23 @@ app.get('/tasks/:userId', async (req, res) => {
     res.status(200).send({newGroup});
 
   });
+
+  app.get("/getGroup/:id",async(req,res) => {
+    try{
+        const {id} = req.params;
+        const group = await Group.findOne({_id:id});
+
+        if(group) {
+            res.status(200).send(group);
+        }
+        else {
+            res.status(404).send({msg: "group not found"});
+        }
+    }
+    catch(e) {
+        res.status(500).send(e.message);
+    }
+  })
 
   app.get("/group/:id",async(req,res) => {
 
