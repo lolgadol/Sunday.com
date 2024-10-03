@@ -7,6 +7,7 @@ import Home from './Home';
 import CreateTask from './CreateTask';
 import { UserProvider } from './UserContext';
 import CreateGroup from './CreateGroup';
+import AdminPanel from './AdminPanel';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path="/Home" element={<Home/>} />
           <Route path="/CreateTask" element={<CreateTask/>} />
           <Route path="/CreateGroup" element={<CreateGroup/>} />
+          <Route path= "/AdminPanel" element= {<AdminPanel/>}/>
         </Routes>
       </Router>
     </UserProvider>

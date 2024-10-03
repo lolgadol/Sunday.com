@@ -231,7 +231,8 @@ app.get('/tasks/:userId', async (req, res) => {
                 await memberName.save();
             }
         })
-        await Group.deleteOne({_id: group});
+        await Task.deleteMany({creator_id:group});//deleting the tasks of the group
+        await Group.deleteOne({_id: group});//deleting group
     }
     else {
         const newMembers = groupFound.memberId.filter((memberId) => memberId !== userId);
@@ -252,6 +253,23 @@ app.get('/tasks/:userId', async (req, res) => {
     res.status(200).send({msg: "task created"});
   });
 
+  app.post("/promote",async(req,res)=>{
+    try{
+        const {newAdmin} = req.body;
+        const group = await Group.findOne({_id: newAdmin.group});
+        if(group.adminId == newAdmin._id) {
+            return res.status(409).send({msg: "nigga is you dumb"});
+        }
+        group.adminId = newAdmin._id;
+    
+        await group.save();
+    
+        res.status(200).send({msg: "succesfully appointed admin"});
+
+    }catch(e) {
+        res.status(500).send({msg: e.message})
+    }
+  })
 
 
 

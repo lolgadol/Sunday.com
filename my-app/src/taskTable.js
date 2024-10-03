@@ -57,7 +57,6 @@ const TaskTable = () => {
     // ];
     const navigate = useNavigate();
 
-    
 
 
       useEffect(() =>{

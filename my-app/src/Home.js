@@ -57,7 +57,7 @@ const Home = ()=> {
 
 
     return(
-        //TODO: figure out button visibility
+        
         <div>
             <h1>welcome {user.username}</h1>
             <Button onClick={()=>newTaskButton()}>Create New Task</Button>
