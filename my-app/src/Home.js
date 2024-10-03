@@ -31,6 +31,26 @@ const Home = ()=> {
     }
 
     useEffect(()=> {
+        if(user.isKickedOrNewAdmin) {
+
+            if(user.isKickedOrNewAdmin == "kicked") {
+                alert("You have been kicked from your group");
+                user.isKickedOrNewAdmin = "";
+    
+    
+            }
+            else if(user.isKickedOrNewAdmin == "NewAdmin") {
+                alert("you have been appointed admin of your group");
+                user.isKickedOrNewAdmin = ""; 
+            }
+
+            fetch("http://localhost:5000/user/" + user._id, {
+                method: "PUT",
+                body: JSON.stringify(user),
+                headers: {"Content-Type" : "application/json"}
+            });
+            
+        }
         isAdmin();
     },[user])
 
