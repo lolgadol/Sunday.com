@@ -1,80 +1,103 @@
+import { useState, useEffect } from 'react';
+import { XIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-import { useEffect } from 'react';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import Modal from 'react-bootstrap/Modal';
-import { useUserContext } from './UserContext';
-import { useState } from 'react';
+export default function JoinGroupModal({ show, setShow, setEndEdit, user, setUser }) {
+  const [groupName, setGroupName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
 
-
-function JoinGroupModal({show,setShow,setEndEdit}) {
-
-
-  const [groupName,setGroupName] = useState('');
-
-  const {user,setUser} = useUserContext();
-  
-  const handleClose = () => setShow(false);
+  const handleClose = () => {
+    setShow(false);
+    setGroupName('');
+    setError(null);
+  };
 
   async function joinGroupButton() {
-
-    if(!user.group) {
-      const response = await fetch("http://localhost:5000/joinGroup",{
+    if (user.group) {
+      setError("You're already in a group.");
+      return;
+    }
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("http://localhost:5000/joinGroup", {
         method: "POST",
-        headers: {"Content-Type" : "application/json"},
-        body: JSON.stringify({userId:user._id,groupName})
-      })
-  
-      if(response.ok) {
-        alert("group joined succesfully");
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user._id, groupName }),
+      });
+      if (response.ok) {
         const responseJson = await response.json();
-        setUser((user )=> ({
-          ...user, group:responseJson.group
-        }))
+        setUser((prevUser) => ({
+          ...prevUser,
+          group: responseJson.group,
+        }));
         handleClose();
+      } else {
+        const errorData = await response.json();
+        setError(errorData.msg || "Failed to join group");
       }
-      else { 
-        const error = await response.json();
-        alert(error.msg);
-      }
-
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-    else {
-      alert("already in group");
-      handleClose();
-    }
-
   }
 
-  //TODO: update task table when joining a group
-    return (
-        <Modal show={show} onHide={handleClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>Update Task</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form>
-              <Form.Group className="mb-3" controlId="formName">
-                <Form.Label> Group Name</Form.Label>
-                <Form.Control
-                  name="name"
-                  onChange={(e) => setGroupName(e.target.value)}              
-                />
-              </Form.Group>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={() => handleClose()} variant="secondary">
-              Close
-            </Button>
-            <Button onClick={() => joinGroupButton()} variant="primary">
-              Join Group
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      );
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: { opacity: 1, scale: 1 },
+  };
+
+  return (
+    <motion.div
+      initial="hidden"
+      animate={show ? 'visible' : 'hidden'}
+      variants={modalVariants}
+      transition={{ duration: 0.3 }}
+      className="fixed inset-0 flex items-center justify-center p-4 z-50"
+    >
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+        <div className="flex justify-between items-center p-6 border-b">
+          <h2 className="text-xl font-semibold text-gray-900">Join Group</h2>
+          <button onClick={handleClose} className="text-gray-400 hover:text-gray-500">
+            <XIcon className="h-6 w-6" />
+          </button>
+        </div>
+        <div className="p-6">
+          <div className="mb-4">
+            <label htmlFor="groupName" className="block text-sm font-medium text-gray-700 mb-2">
+              Group Name
+            </label>
+            <input
+              type="text"
+              id="groupName"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              value={groupName}
+              onChange={(e) => setGroupName(e.target.value)}
+              placeholder="Enter group name"
+            />
+          </div>
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        </div>
+        <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3 rounded-b-lg">
+          <button
+            onClick={handleClose}
+            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={joinGroupButton}
+            disabled={isLoading || !groupName.trim()}
+            className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+              isLoading || !groupName.trim() ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+          >
+            {isLoading ? 'Joining...' : 'Join Group'}
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
 }
-
-
-
-export default JoinGroupModal;
