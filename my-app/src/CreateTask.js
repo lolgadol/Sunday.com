@@ -28,7 +28,7 @@ export default function CreateTask() {
     const body =
       taskPersonal === "personal"
         ? { creator_id: user._id, name, priority, status, dueDate }
-        : { creator_id: user._id, group_id: user.group, name, priority, status, dueDate }
+        : { creator_id: user._id, group_id: user.group, name, priority, status, dueDate,user_id: user._id }
 
     if (taskPersonal === "group" && !user.group) {
       alert("You are not part of any group")
