@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { XIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useUserContext } from './UserContext';
 
-export default function JoinGroupModal({ show, setShow, setEndEdit, user, setUser }) {
+export default function JoinGroupModal({ show, setShow, setEndEdit }) {
   const [groupName, setGroupName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
+
+  const {user,setUser} = useUserContext();
 
   const handleClose = () => {
     setShow(false);
@@ -38,6 +41,7 @@ export default function JoinGroupModal({ show, setShow, setEndEdit, user, setUse
         setError(errorData.msg || "Failed to join group");
       }
     } catch (err) {
+      console.log(err.message);
       setError("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
@@ -49,10 +53,13 @@ export default function JoinGroupModal({ show, setShow, setEndEdit, user, setUse
     visible: { opacity: 1, scale: 1 },
   };
 
+  if (!show) return null;
+
   return (
     <motion.div
       initial="hidden"
-      animate={show ? 'visible' : 'hidden'}
+      animate="visible"
+      exit="hidden"
       variants={modalVariants}
       transition={{ duration: 0.3 }}
       className="fixed inset-0 flex items-center justify-center p-4 z-50"
