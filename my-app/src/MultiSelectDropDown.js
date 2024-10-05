@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, Check } from 'lucide-react'
 
@@ -8,13 +8,19 @@ export default function MultiSelectDropdown({
   setSelectedOptions,
   show,
   setShow,
-  options
+  options,
+  task
 }){
 
   const handleToggle = () => {
     console.log(options);
-    setShow(!show)
+    setShow(!show);
   }
+
+  useEffect(() =>{
+    setSelectedOptions(task.workingOnIt);
+    setShow(false);
+  },[task])
 
   const handleOptionClick = (option) => {
     setSelectedOptions((prevSelected) => {
