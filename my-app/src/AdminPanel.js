@@ -65,7 +65,7 @@ export default function AdminPanel() {
   async function kickButton(user) {
     const response = await fetch("http://localhost:5000/leaveGroup", {
       method: "POST",
-      body: JSON.stringify({ userId: user._id }),
+      body: JSON.stringify({ userId: user._id,kicked: true }),
       headers: { "Content-Type": "application/json" }
     })
 

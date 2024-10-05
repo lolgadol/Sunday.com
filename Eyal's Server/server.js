@@ -235,7 +235,7 @@ app.get('/tasks/:userId', async (req, res) => {
   })
 
   app.post("/leaveGroup",async(req,res) => {
-    const {userId} = req.body;
+    const {userId,kicked} = req.body;
     const user = await User.findOne({_id:userId});
     const group = user.group;
 
@@ -257,7 +257,9 @@ app.get('/tasks/:userId', async (req, res) => {
     }
     else {
         const newMembers = groupFound.memberId.filter((memberId) => memberId !== userId);
-        user.isKickedOrNewAdmin = "kicked";
+        if(kicked) {
+            user.isKickedOrNewAdmin = "kicked";
+        }
         groupFound.memberId = newMembers;
         //TODO: add new Admin
         await groupFound.save();
