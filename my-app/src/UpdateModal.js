@@ -7,6 +7,7 @@ import MultiSelectDropdown from './MultiSelectDropDown'
 export default function UpdateModal({ show, setShow, task, setEndEdit }) {//TODO: fix dates not being recognized
   const [selectedOptions, setSelectedOptions] = useState([])
   const [options, setOptions] = useState([])
+  const [showMultiSelect,setShowMultiSelect] = useState(false);
   const { user } = useUserContext()
 
   const [formData, setFormData] = useState({
@@ -24,6 +25,9 @@ export default function UpdateModal({ show, setShow, task, setEndEdit }) {//TODO
     if (response.ok) {
       const responseJson = await response.json()
       setOptions(responseJson.map(user => user.username))
+    }
+    else {
+      setOptions([]);
     }
   }
 
@@ -170,12 +174,16 @@ export default function UpdateModal({ show, setShow, task, setEndEdit }) {//TODO
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                     />
                   </div>
-                  <MultiSelectDropdown
-                    setShow={() => {}}
+                  {options.length > 0 &&(
+                    <MultiSelectDropdown
+                    setShow={setShowMultiSelect}
+                    show={showMultiSelect}
                     options={options}
                     setSelectedOptions={setSelectedOptions}
                     selectedOptions={selectedOptions}
-                  />
+                  />                    
+                  )}
+
                 </div>
 
                 <div className="mt-6 flex justify-end space-x-2">
