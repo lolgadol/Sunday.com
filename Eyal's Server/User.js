@@ -13,7 +13,11 @@ const UserSchema = new mongoose.Schema({
     group: {
         type: String,
         default: ""
-    }
+    },
+    isKickedOrNewAdmin: {
+        type: String,
+    },
+    
 })
 const User = mongoose.model("User",UserSchema);
 module.exports = User;

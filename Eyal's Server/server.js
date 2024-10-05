@@ -25,6 +25,27 @@ app.get("/user/:id",async(req,res)=> {
     }
 });
 
+app.put("/user/:id",async(req,res)=>{
+    try{
+        const {id} = req.params;
+        const user = await User.findOne({_id:id});
+        const {username,password,group,isKickedOrNewAdmin} = req.body;
+        console.log({username,password,group,isKickedOrNewAdmin});
+        user.username = username;
+        user.password = password;
+        user.group = group;
+        user.isKickedOrNewAdmin = isKickedOrNewAdmin;
+        
+        await user.save();
+
+        res.status(200).send({msg:"User updated succesfully"});
+
+    }
+    catch(e) {
+        res.status(500).send({msg: e.message});
+    }
+})
+
 
 app.post("/login",async(req,res) =>{
     const {username,password} = req.body;
@@ -214,7 +235,7 @@ app.get('/tasks/:userId', async (req, res) => {
   })
 
   app.post("/leaveGroup",async(req,res) => {
-    const {userId} = req.body;
+    const {userId,kicked} = req.body;
     const user = await User.findOne({_id:userId});
     const group = user.group;
 
@@ -231,10 +252,14 @@ app.get('/tasks/:userId', async (req, res) => {
                 await memberName.save();
             }
         })
-        await Group.deleteOne({_id: group});
+        await Task.deleteMany({creator_id:group});//deleting the tasks of the group
+        await Group.deleteOne({_id: group});//deleting group
     }
     else {
         const newMembers = groupFound.memberId.filter((memberId) => memberId !== userId);
+        if(kicked) {
+            user.isKickedOrNewAdmin = "kicked";
+        }
         groupFound.memberId = newMembers;
         //TODO: add new Admin
         await groupFound.save();
@@ -252,6 +277,27 @@ app.get('/tasks/:userId', async (req, res) => {
     res.status(200).send({msg: "task created"});
   });
 
+  app.post("/promote",async(req,res)=>{
+    try{
+        const {newAdmin} = req.body;
+        const user = await User.findOne({_id:newAdmin._id})
+        const group = await Group.findOne({_id: newAdmin.group});
+        if(group.adminId == newAdmin._id) {
+            return res.status(409).send({msg: "nigga is you dumb"});
+        }
+        group.adminId = newAdmin._id;
+
+        user.isKickedOrNewAdmin = "NewAdmin";
+    
+        await group.save();
+        await user.save();
+
+        res.status(200).send({msg: "succesfully appointed admin"});
+
+    }catch(e) {
+        res.status(500).send({msg: e.message})
+    }
+  })
 
 
 
